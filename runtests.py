@@ -6,6 +6,7 @@ SRC_PATH = 'src/'
 TESTS_PATH = 'tests/'
 
 subprocess.call(['g++',
+                 '-fsanitize=address',
                  '-o',
                  f'{BIN_PATH}/test',
                  '-g',
