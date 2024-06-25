@@ -1,39 +1,11 @@
 #include <malloc.h>
 #include <stddef.h>
 
-struct arr {
-    void   **inner_arr;
-    size_t   len;
-    size_t   cap;
-};
-
-typedef struct arr arr;
-
-static int __arr_expand(arr *array)
-{
-    if (array == NULL || array->inner_arr == NULL) {
-        return 1;
-    }
-
-    if (array->cap > __SIZE_MAX__ / 2) {
-        array->cap = __SIZE_MAX__;
-    } else if (array->cap == 0) {
-        array->cap = 2;
-    } else {
-        array->cap *= 2;
-    }
-
-    array->inner_arr = (void**)realloc(array->inner_arr, array->cap * sizeof(void*));
-    if (array->inner_arr == NULL) {
-        return 1;
-    }
-
-    return 0;
-}
+#include "arr_static.c"
 
 arr *arr_init(size_t initial_cap)
 {
-    if (initial_cap < 1 || initial_cap > 0x10000000000 / 4) {
+    if (initial_cap < 1) {
         return NULL;
     }
 
@@ -65,7 +37,7 @@ void **arr_inner(arr *array)
 
 size_t arr_len(arr* array)
 {
-    if (array == NULL || array->inner_arr == NULL) {
+    if (array == NULL || arr_inner(array) == NULL) {
         return 0;
     }
 
@@ -74,7 +46,7 @@ size_t arr_len(arr* array)
 
 size_t arr_cap(arr* array)
 {
-    if (array == NULL || array->inner_arr == NULL) {
+    if (array == NULL || arr_inner(array) == NULL) {
         return 0;
     }
 
@@ -83,19 +55,19 @@ size_t arr_cap(arr* array)
 
 int arr_append(arr *array, void *obj)
 {
-    if (array == NULL || array->inner_arr == NULL || obj == NULL) {
+    if (array == NULL || arr_inner(array) == NULL || obj == NULL) {
         return 1;
     }
 
-    if (array->len == array->cap) {
+    if (arr_len(array) == arr_cap(array)) {
         if (__arr_expand(array)) {
             return 1;
         }
-    } else if (array->len > array->cap) {
+    } else if (arr_len(array) > arr_cap(array)) {
         return 1;
     }
 
-    array->inner_arr[array->len] = obj;
+    array->inner_arr[arr_len(array)] = obj;
     array->len++;
 
     return 0;
@@ -103,13 +75,40 @@ int arr_append(arr *array, void *obj)
 
 void *arr_get(arr *array, size_t index)
 {
-    if (array == NULL || array->inner_arr == NULL) {
+    if (array == NULL || arr_inner(array) == NULL) {
         return NULL;
     }
 
-    if (index >= array->len) {
+    if (index >= arr_len(array)) {
         return NULL;
     }
 
-    return array->inner_arr[index];
+    return arr_inner(array)[index];
+}
+
+int arr_free(arr *array)
+{
+    if (array == NULL || arr_inner(array) == NULL) {
+        return 1;
+    }
+
+    free(arr_inner(array));
+    free(array);
+
+    return 0;
+}
+
+int  arr_super_free(arr *array, int (*free_obj)(void*))
+{
+    if (array == NULL || arr_inner(array) == NULL || free_obj == NULL) {
+        return 1;
+    }
+
+    for (size_t i = 0; i < arr_len(array); ++i) {
+        if (free_obj(arr_get(array, i))) {
+            return 1;
+        }
+    }
+
+    return arr_free(array);
 }
