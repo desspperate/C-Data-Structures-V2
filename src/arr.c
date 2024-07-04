@@ -1,5 +1,4 @@
 #include <malloc.h>
-#include <stddef.h>
 
 #include "arr_static.c"
 
@@ -22,6 +21,7 @@ arr *arr_init(size_t initial_cap)
 
     res->len = 0;
     res->cap = initial_cap;
+    res->free_obj = NULL;
 
     return res;
 }
@@ -98,17 +98,30 @@ int arr_free(arr *array)
     return 0;
 }
 
-int  arr_super_free(arr *array, int (*free_obj)(void*))
+int arr_clear(arr *array)
 {
-    if (array == NULL || arr_inner(array) == NULL || free_obj == NULL) {
+    if (array == NULL || arr_inner(array) == NULL || array->free_obj == NULL) {
         return 1;
     }
 
     for (size_t i = 0; i < arr_len(array); ++i) {
-        if (free_obj(arr_get(array, i))) {
+        if (array->free_obj(arr_get(array, i))) {
             return 1;
         }
     }
 
+    return 0;
+}
+
+int arr_super_free(arr *array)
+{
+    if (array == NULL || arr_inner(array) == NULL || array->free_obj == NULL) {
+        return 1;
+    }
+
+    if (arr_clear(array)) {
+        return 1;
+    }
+    
     return arr_free(array);
 }

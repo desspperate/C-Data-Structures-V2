@@ -7,16 +7,17 @@ SRC_PATH = 'src/'
 TESTS_PATH = 'tests/'
 
 subprocess.call(['g++',
-                 '-O2',
-                 #'-fsanitize=address',
-                 '-o',
-                 f'{BIN_PATH}/test',
-                 '-g',
-                 f'{TESTS_PATH}/main.cpp',
-                 f'{TESTS_PATH}/arr.cpp',
-                 f'{SRC_PATH}/arr.c',
+                '-fsanitize=address',
+                '-O2',
+                '-o',
+                f'{BIN_PATH}/test',
+                '-g',
+                f'{TESTS_PATH}/main.cpp',
+                f'{TESTS_PATH}/arr.cpp',
+                f'{TESTS_PATH}/hashmap.cpp',
+                f'{SRC_PATH}/arr.c',
+                f'{SRC_PATH}/hashmap.c',
                 '-lgtest',
-                '-lpthread'
                 ])
 
 environ['ASAN_OPTIONS'] = 'allocator_may_return_null=1'
