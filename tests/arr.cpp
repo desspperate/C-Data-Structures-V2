@@ -159,7 +159,7 @@ TEST(array, append)
     *n = 10;
 
     array->len = arr_cap(array) + 1;
-    EXPECT_EQ(arr_append(array, n), 1);
+    EXPECT_TRUE(arr_append(array, n));
     array->len = 0;
 
     free(arr_inner(array));
@@ -168,7 +168,7 @@ TEST(array, append)
     EXPECT_TRUE(arr_append(array, n));
     free(n);
 
-    free(array);
+    free(array); 
     
     array = arr_init(1);
 
@@ -185,8 +185,36 @@ TEST(array, append)
         }
     }
 
-    array->free_obj == free_int;
+    array->free_obj = free_int;
     arr_super_free(array);
+}
+
+TEST(array, pop)
+{
+    EXPECT_TRUE(arr_pop(NULL) == NULL);
+
+    arr *array = arr_init(1);
+
+    EXPECT_TRUE(arr_pop(array) == NULL);
+
+    int *n = (int*)malloc(sizeof(int));
+
+    arr_append(array, n);
+
+    EXPECT_TRUE(arr_pop(array) == n);
+
+    EXPECT_TRUE(arr_inner(array)[arr_len(array)] == NULL);
+
+    EXPECT_TRUE(!array->len);
+    
+    free(n);
+
+    free(arr_inner(array));
+    array->inner_arr = NULL;
+
+    EXPECT_TRUE(arr_pop(array) == NULL); 
+
+    free(array);
 }
 
 TEST(array, get)
@@ -234,6 +262,7 @@ TEST(array, free)
     array->inner_arr = NULL;
 
     EXPECT_EQ(arr_free(array), 1);
+    free(array);
 }
 
 TEST(array, clear)
@@ -262,6 +291,7 @@ TEST(array, clear)
     array->inner_arr = NULL;
 
     EXPECT_EQ(arr_clear(array), 1);
+    free(array);
 }
 
 TEST(array, super_free)
@@ -288,6 +318,7 @@ TEST(array, super_free)
     array->inner_arr = NULL;
 
     EXPECT_EQ(arr_super_free(array), 1);
+    free(array);
 }
 
 TEST(array, buble_sort)

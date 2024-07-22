@@ -24,6 +24,8 @@ extern int arr_append(arr *array, void *obj);
 
 extern void *arr_get(arr *array, size_t index);
 
+extern void *arr_pop(arr *array);
+
 extern int arr_free(arr *array);
 
 extern int arr_clear(arr *array);

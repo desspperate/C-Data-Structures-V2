@@ -86,6 +86,24 @@ void *arr_get(arr *array, size_t index)
     return arr_inner(array)[index];
 }
 
+void *arr_pop(arr *array)
+{
+    if (array == NULL || arr_inner(array) == NULL) {
+        return NULL;
+    }
+
+    if (!arr_len(array)) {
+        return NULL;
+    }
+
+    void *obj = arr_inner(array)[arr_len(array) - 1];
+    
+    arr_inner(array)[arr_len(array) - 1] = NULL; 
+    array->len--;
+
+    return obj;
+}
+
 int arr_free(arr *array)
 {
     if (array == NULL || arr_inner(array) == NULL) {

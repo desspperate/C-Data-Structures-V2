@@ -3,21 +3,25 @@
 
 #include "arr.h"
 
+typedef struct pair {
+    void *key;
+    void *value;
+} pair;
+
 typedef struct hashmap {
     arr     **buckets;
     double    expand_at;
     size_t    len;
     size_t    cap;
     int       (*hash_code)(void*);
+    int       (*keys_eq)(void*, void*);
+    int       (*free_pair)(void*);
 } hashmap;
 
-typedef struct pair {
-    void *key;
-    void *value;
-} pair;
+extern hashmap *hashmap_init(size_t init_cap, float expand_at, int (*hash_code)(void*), int (*keys_eq)(void*, void*), int (*free_pair)(void*));
 
-extern hashmap *hashmap_init(size_t init_cap, float expand_at, int (*hash_code)(void*));
+extern int hashmap_put(hashmap *hashmap_, pair *pair_);
 
-extern int hashmap_put(hashmap *hashmap_, pair pair_);
+extern void *hashmap_get(hashmap *hashmap_, void *key);
 
 #endif
