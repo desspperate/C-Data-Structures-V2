@@ -64,11 +64,7 @@ TEST(hashmap, init)
         val[3] = rand() % 10 + '0';
         val[4] = 0;
 
-        pair *p = (pair*)malloc(sizeof(pair));
-        p->key = key;
-        p->value = val;
-
-        if (hashmap_put(map, p)) {
+        if (hashmap_put(map, key, val)) {
             printf("Put error!");
             exit(EXIT_FAILURE);
         }
@@ -85,12 +81,5 @@ TEST(hashmap, init)
         }
     }
 
-    for (size_t i = 0; i < map->cap; ++i) {
-        if (arr_super_free(map->buckets[i])) {
-            puts("Free eror!\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-    free(map->buckets);
-    free(map);
+    hashmap_super_free(map);
 }

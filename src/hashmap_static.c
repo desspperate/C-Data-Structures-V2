@@ -58,9 +58,10 @@ static int __hashmap_rehash(hashmap *hashmap_)
     hashmap_->len = 0;
 
     for (size_t j = 0; j < i; ++j) {
-        if (hashmap_put(hashmap_, pairs[j])) {
+        if (hashmap_put(hashmap_, pairs[j]->key, pairs[j]->value)) {
             return 1;
         }
+        free(pairs[j]);
     }
 
     free(pairs);
