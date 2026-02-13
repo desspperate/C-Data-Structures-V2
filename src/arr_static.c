@@ -1,5 +1,5 @@
-#ifndef _ARR_STATIC_C
-#define _ARR_STATIC_C
+#ifndef _DSP_ARR_STATIC_C
+#define _DSP_ARR_STATIC_C
 
 #include "include/arr.h"
 
